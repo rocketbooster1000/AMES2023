@@ -3,7 +3,7 @@ package frc.robot.subsystems.scoring;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class EndEffector extends SubsystemBase {
+public class EndEffectorSubsystem extends SubsystemBase {
     public static double BALL_SPIKE_CURRENT = 11;
     public static double ACCEL_SPIKE_CURRENT = 15;
 
@@ -13,9 +13,9 @@ public class EndEffector extends SubsystemBase {
     private final CANSparkMax rightMotor = new CANSparkMax(26, CANSparkMax.MotorType.kBrushed);
 
 
-    private static EndEffector instance;
+    private static EndEffectorSubsystem instance;
 
-    private EndEffector() {
+    private EndEffectorSubsystem() {
         this.setName("End Effector");
         this.register();
 
@@ -61,8 +61,12 @@ public class EndEffector extends SubsystemBase {
                 || (rightMotor.getOutputCurrent() > BALL_SPIKE_CURRENT && rightMotor.getOutputCurrent() < ACCEL_SPIKE_CURRENT);
     }
 
-    public static EndEffector getInstance(){
-        if (instance == null) instance = new EndEffector();
+    public boolean aboveSpikeLimit(){
+        return leftMotor.getOutputCurrent() > BALL_SPIKE_CURRENT || rightMotor.getOutputCurrent() > BALL_SPIKE_CURRENT;
+    }
+
+    public static EndEffectorSubsystem getInstance(){
+        if (instance == null) instance = new EndEffectorSubsystem();
         return instance;
     }
 }
