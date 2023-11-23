@@ -1,15 +1,21 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.scoring;
 
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class EndEffector extends SubsystemBase {
+    public static double BALL_SPIKE_CURRENT = 11;
+    public static double ACCEL_SPIKE_CURRENT = 15;
+
+    public static double NORMAL_ACTIVE_SPEED = 0.25;
+
     private final CANSparkMax leftMotor = new CANSparkMax(59, CANSparkMax.MotorType.kBrushed);
     private final CANSparkMax rightMotor = new CANSparkMax(26, CANSparkMax.MotorType.kBrushed);
 
-    private boolean hasBall;
 
-    public EndEffector() {
+    private static EndEffector instance;
+
+    private EndEffector() {
         this.setName("End Effector");
         this.register();
 
@@ -23,14 +29,7 @@ public class EndEffector extends SubsystemBase {
     }
 
     public void periodic() {
-        if (leftMotor.getOutputCurrent() > 13 && rightMotor.getOutputCurrent() > 13)
-            hasBall = true;
 
-        if (!hasBall)
-            this.startIntake(0.25);
-
-        else
-            this.brake();
     }
 
     public void startIntake(double speed) {
@@ -48,7 +47,22 @@ public class EndEffector extends SubsystemBase {
         this.rightMotor.set(-speed);
     }
 
-    public void setBall(boolean b) {
-        this.hasBall = b;
+    public void startIntake(){
+        this.startIntake(NORMAL_ACTIVE_SPEED);
+    }
+
+    public void startOutput(){
+        this.startOutput(NORMAL_ACTIVE_SPEED);
+    }
+
+
+    public boolean hasBall(){
+        return (leftMotor.getOutputCurrent() > BALL_SPIKE_CURRENT && leftMotor.getOutputCurrent() < ACCEL_SPIKE_CURRENT) 
+                || (rightMotor.getOutputCurrent() > BALL_SPIKE_CURRENT && rightMotor.getOutputCurrent() < ACCEL_SPIKE_CURRENT);
+    }
+
+    public static EndEffector getInstance(){
+        if (instance == null) instance = new EndEffector();
+        return instance;
     }
 }
