@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.swerve.Gyroscope;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -48,7 +49,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.zeroAllOutputs();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -56,12 +60,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
+    CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during autonomous. */
@@ -70,6 +69,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.enableControllers();
+    
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -77,11 +79,19 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    System.out.println(Gyroscope.getPigeonInstance().getYaw());
+  }
+
+  @Override
+  public void teleopExit(){
+    m_robotContainer.disableControllers();
+  }
 
   @Override
   public void testInit() {
